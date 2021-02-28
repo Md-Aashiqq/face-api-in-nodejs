@@ -12,14 +12,22 @@ const app = express();
 
 app.use(express.static("public"));
 
-app.get("/", (req, res) => {
+const loadModel = async () => {
   Promise.all([
-    faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-    faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-    faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-  ]).then(() => {
-    console.log("model loded sucessfully");
-  });
+    faceapi.nets.faceRecognitionNet.loadFromDisk("./models"),
+    faceapi.nets.faceLandmark68Net.loadFromDisk("./models"),
+    faceapi.nets.ssdMobilenetv1.loadFromDisk("./models"),
+  ])
+    .then(() => {
+      console.log("model loded sucessfully");
+    })
+    .catch((err) => {
+      console.log("load models faile");
+    });
+};
+
+app.get("/", (req, res) => {
+  loadModel();
 
   res.send("hello world");
 });
