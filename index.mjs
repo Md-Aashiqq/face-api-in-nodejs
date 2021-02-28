@@ -10,16 +10,16 @@ import * as tf from "@tensorflow/tfjs-node";
 
 const app = express();
 
-app.use(express.static(__dirname + "/public"));
+app.use(express.static("public"));
 
 app.get("/", (req, res) => {
-  // Promise.all([
-  //   faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-  //   faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-  //   faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-  // ]).then(() => {
-  //   console.log('model loded sucessfully')
-  // });
+  Promise.all([
+    faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+    faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+    faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+  ]).then(() => {
+    console.log("model loded sucessfully");
+  });
 
   res.send("hello world");
 });
