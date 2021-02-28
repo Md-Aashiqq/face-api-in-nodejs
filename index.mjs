@@ -8,7 +8,7 @@ import * as tf from "@tensorflow/tfjs-node";
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send({ msg: "hello", td: tf.model() });
+  res.send({ msg: "hello", td: tf });
 });
 
 const port = process.env.PORT || 3000;
