@@ -11,30 +11,14 @@ import * as canvas from "canvas";
 
 import * as faceapi from "face-api.js";
 
-// import * as tf from "@tensorflow/tfjs-node";
+import "@tensorflow/tfjs-node";
 
 // Make face-api.js use that fetch implementation
-// faceapi.env.monkeyPatch({ fetch: fetch });
+faceapi.env.monkeyPatch({ fetch: fetch });
 
 const app = express();
 
 app.use(express.static("public"));
-
-// const MODELS_URL = path.join(__dirname, "./models");
-
-// const loadModel = async () => {
-//   // Promise.all([
-//     faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-//     faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-//     faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-//   // ])
-//   //   .then(() => {
-//   //     console.log("model loded sucessfully");
-//   //   })
-//   //   .catch((err) => {
-//   //     console.log("load models faile");
-//   //   });
-// };
 
 app.get("/", async (req, res) => {
   const MODEL_URL = `./public/models/`;
