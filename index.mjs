@@ -12,24 +12,26 @@ const app = express();
 
 app.use(express.static("public"));
 
-const loadModel = async () => {
-  Promise.all([
-    faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-    faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-    faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-  ])
-    .then(() => {
-      console.log("model loded sucessfully");
-    })
-    .catch((err) => {
-      console.log("load models faile");
-    });
-};
+// const loadModel = async () => {
+//   // Promise.all([
+//     faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+//     faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+//     faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+//   // ])
+//   //   .then(() => {
+//   //     console.log("model loded sucessfully");
+//   //   })
+//   //   .catch((err) => {
+//   //     console.log("load models faile");
+//   //   });
+// };
 
-app.get("/", (req, res) => {
-  loadModel();
+app.get("/", async (req, res) => {
+  // loadModel();
 
-  res.send("hello world");
+  const data = await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+
+  res.send(data);
 });
 
 const port = process.env.PORT || 3000;
