@@ -4,9 +4,8 @@ import "@tensorflow/tfjs-node";
 
 const app = express();
 
-
 app.get("/", (req, res) => {
-  res.send("hello world");
+  res.send({ msg: "hello" });
 });
 
 app.listen(3001, () => {
