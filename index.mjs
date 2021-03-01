@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import path from "path";
-
+import cors from "cors";
 // Import a fetch implementation for Node.js
 import fetch from "node-fetch";
 
@@ -13,14 +13,17 @@ import * as faceapi from "face-api.js";
 
 import "@tensorflow/tfjs-node";
 
-// Make face-api.js use that fetch implementation
-faceapi.env.monkeyPatch({ fetch: fetch });
-
 const app = express();
+app.use(cors());
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "*");
+  next();
+});
 
 app.use(express.static("public"));
 
-app.get("/", async (req, res) => {
+app.get("/load", async (req, res) => {
   const MODEL_URL = `./public/models/`;
 
   faceapi.default.nets.ssdMobilenetv1
@@ -33,6 +36,12 @@ app.get("/", async (req, res) => {
       console.log(error);
     });
   res.send({ data: "hello" });
+});
+
+app.post("/loadimage", async (req, res) => {
+  console.log(req.body);
+
+  res.status(200).json({ data: req.body });
 });
 
 const port = process.env.PORT || 3000;
