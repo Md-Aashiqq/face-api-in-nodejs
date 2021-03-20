@@ -29,6 +29,8 @@
 
         formElem.onsubmit = async (e) => {
             e.preventDefault();
+
+            console.log('CLICK')
         
             let response = await fetch('https://faceapimodejs.herokuapp.com/loadimage', {
               method: 'POST',
