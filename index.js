@@ -5,7 +5,7 @@ const cors = require("cors");
 const fetch = require("node-fetch");
 const b = require("based-blob");
 const faceapi = require("face-api.js");
-// const tf = require("@tensorflow/tfjs-node");
+const tf = require("@tensorflow/tfjs-node");
 const canvas = require("canvas");
 const fileUpload = require("express-fileupload");
 const { registerFont, createCanvas } = require("canvas");
@@ -101,15 +101,19 @@ app.post("/loadimage", async (req, res, next) => {
   //   description
   // );
 
- const promise = new Promise((resolve,rejects)=>{
-    const result = new faceapi.LabeledFaceDescriptors(
+ const promise = ()=>{
+
+  return new Promise((resolve,rejects)=>{
+     
+      resolve(new faceapi.LabeledFaceDescriptors(
         studentName,
         description
-      );
-      resolve(result)
+      ))
 
   })
 
+ }  
+s
 
   promise().then((data)=>{ console.log(data); 
      res.status(200).json({ data: result });
