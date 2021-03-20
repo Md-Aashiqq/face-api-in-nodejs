@@ -1,19 +1,28 @@
 require("dotenv").config();
+
 const express = require("express");
+
 const path = require("path");
+
 const cors = require("cors");
+
 const fetch = require("node-fetch");
 const b = require("based-blob");
 const faceapi = require("face-api.js");
 const tf = require("@tensorflow/tfjs-node");
 const canvas = require("canvas");
+// const { Image } = require("canvas");
+// const ImageData = require("canvas");
 const fileUpload = require("express-fileupload");
+
 const { registerFont, createCanvas } = require("canvas");
 
+const multer = require("multer");
+// const upload = multer();
+
+var upload = multer({ dest: "upload/" });
+// var type = upload.single("file");
 const app = express();
-
-// MiddileWare
-
 app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
@@ -96,32 +105,14 @@ app.post("/loadimage", async (req, res, next) => {
     description.push(detection.descriptor);
   }
 
-  // const result = await new faceapi.LabeledFaceDescriptors(
-  //   studentName,
-  //   description
-  // );
+  const result = new faceapi.LabeledFaceDescriptors(
+    studentName,
+    description
+  );
 
- const promise = ()=>{
+  console.log(result);
 
-  return new Promise((resolve,rejects)=>{
-     
-      resolve(new faceapi.LabeledFaceDescriptors(
-        studentName,
-        description
-      ))
-
-  })
-
- }  
-s
-
-  promise().then((data)=>{ console.log(data); 
-     res.status(200).json({ data: result });
-  })
-
-
-
-
+  res.status(200).json({ data: result });
 });
 
 const port = process.env.PORT || 3000;
