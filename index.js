@@ -1,27 +1,21 @@
 require("dotenv").config();
-
 const express = require("express");
-
 const path = require("path");
-
 const cors = require("cors");
-
 const fetch = require("node-fetch");
 const b = require("based-blob");
 const faceapi = require("face-api.js");
 const tf = require("@tensorflow/tfjs-node");
 const canvas = require("canvas");
-// const { Image } = require("canvas");
-// const ImageData = require("canvas");
 const fileUpload = require("express-fileupload");
 
 const { registerFont, createCanvas } = require("canvas");
 
-const multer = require("multer");
-// const upload = multer();
 
-var upload = multer({ dest: "upload/" });
-// var type = upload.single("file");
+// const dataModel = require("./models/data");
+const DataModel = require("./models/data");
+
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -112,7 +106,17 @@ app.post("/loadimage", async (req, res, next) => {
 
   console.log(result);
 
-  res.status(200).json({ data: result });
+
+  const stotreData = {
+    clsName : 'cseA',
+    data: result
+  }
+
+  const data = await DataModel.create(stotreData)
+
+
+
+  res.status(200).json({ data: data });
 });
 
 const port = process.env.PORT || 3000;
