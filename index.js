@@ -5,13 +5,21 @@ const cors = require("cors");
 const fetch = require("node-fetch");
 const b = require("based-blob");
 const faceapi = require("face-api.js");
-// const tf = require("@tensorflow/tfjs-node");
+const tf = require("@tensorflow/tfjs-node");
 const canvas = require("canvas");
 const fileUpload = require("express-fileupload");
-
 const { registerFont, createCanvas } = require("canvas");
+const mongoose = require("mongoose");
 
-
+mongoose.connect(
+  "mongodb+srv://iammac:Md.aashiqq.2801@cluster0.utz7t.mongodb.net/faceapi?retryWrites=true&w=majority",
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: true,
+  }
+)
 // const dataModel = require("./models/data");
 const DataModel = require("./models/data");
 
@@ -114,7 +122,7 @@ app.post("/loadimage", async (req, res, next) => {
 
   const data = await DataModel.create(stotreData)
 
-
+  console.log(data)
 
   res.status(200).json({ data: data });
 });
