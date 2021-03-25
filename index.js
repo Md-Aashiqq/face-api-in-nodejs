@@ -116,8 +116,6 @@ app.get("/getData", async (req, res) => {
   res.status(200).json({ data: data });
 });
 
-// Comapre group img with DbData
-
 app.post("/compareImage", async (req, res) => {
   const files = req.files.uploadImage;
   const clsName = req.body.clsName;
@@ -127,22 +125,22 @@ app.post("/compareImage", async (req, res) => {
       { data: 1, _id: 0 }
     );
 
-    faceFaceDescriptors = [];
+    // faceFaceDescriptors = [];
 
-    DBdata.forEach((element) => {
-      console.log("start");
-      console.log(element.data._label);
-      const result = new faceapi.LabeledFaceDescriptors(
-        element.data._label,
-        element.data._descriptors
-      );
-      faceFaceDescriptors.push(result);
-    });
-    console.log(faceFaceDescriptors);
+    // DBdata.forEach((element) => {
+    //   console.log("start");
+    //   console.log(element.data._label);
+    //   const result = new faceapi.LabeledFaceDescriptors(
+    //     element.data._label,
+    //     element.data._descriptors
+    //   );
+    //   faceFaceDescriptors.push(result);
+    // });
+    // console.log(faceFaceDescriptors);
 
-    console.log("faceMatcher");
-    const faceMatcher = faceapi.FaceMatcher(faceFaceDescriptors, 0.6);
-    console.log(faceMatcher);
+    // console.log("faceMatcher");
+    // const faceMatcher = faceapi.FaceMatcher(faceFaceDescriptors, 0.6);
+    // console.log(faceMatcher);
 
     console.log("loadImge");
     const img = await canvas.loadImage(uploadImage.data);
