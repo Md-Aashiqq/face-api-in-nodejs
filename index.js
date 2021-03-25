@@ -109,9 +109,55 @@ app.post("/loadimage", async (req, res, next) => {
   res.status(200).json({ data: data });
 });
 
+// Get DB Data
+
 app.get("/getData", async (req, res) => {
   const data = await DataModel.find({ clsName: "cseA" });
   res.status(200).json({ data: data });
+});
+
+// Comapre group img with DbData
+
+app.post("/compareImage", async (req, res) => {
+  const files = req.files.uploadImage;
+  const clsName = req.body.clsName;
+  try {
+    const DBdata = await DataModel.find(
+      { clsName: "cseA" },
+      { data: 1, _id: 0 }
+    );
+
+    faceFaceDescriptors = [];
+
+    DBdata.forEach((element) => {
+      console.log("start");
+      console.log(element.data._label);
+      const result = new faceapi.LabeledFaceDescriptors(
+        element.data._label,
+        element.data._descriptors
+      );
+      faceFaceDescriptors.push(result);
+    });
+    console.log(faceFaceDescriptors);
+
+    console.log("faceMatcher");
+    const faceMatcher = faceapi.FaceMatcher(faceFaceDescriptors, 0.6);
+    console.log(faceMatcher);
+
+    console.log("loadImge");
+    const img = await canvas.loadImage(uploadImage.data);
+    const myCanvas = canvas.createCanvas(200, 200);
+    const ctx = myCanvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, 200, 200);
+    console.log("detection");
+    const detection = await faceapi
+      .detectAllFaces(myCanvas, faceDetectionOptions)
+      .withFaceLandmarks()
+      .withFaceDescriptor();
+    console.log(detection);
+
+    res.status(200).json({ data: DBdata });
+  } catch (e) {}
 });
 
 const port = process.env.PORT || 3000;
