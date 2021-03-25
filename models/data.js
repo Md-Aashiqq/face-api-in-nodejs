@@ -5,6 +5,9 @@ const dataSchema = mongoose.Schema({
     type: String,
     required: ["Please Provied The class Name", true],
   },
+  regNo: {
+    type: String,
+  },
   label: {
     type: String,
   },

@@ -4,7 +4,7 @@ const path = require("path");
 const cors = require("cors");
 const fetch = require("node-fetch");
 const faceapi = require("face-api.js");
-// const tf = require("@tensorflow/tfjs-node");
+const tf = require("@tensorflow/tfjs-node");
 const canvas = require("canvas");
 const fileUpload = require("express-fileupload");
 const { registerFont, createCanvas } = require("canvas");
@@ -79,6 +79,8 @@ app.post("/loadimage", async (req, res, next) => {
   console.log("start");
   const files = req.files.uploadImage;
   const studentName = req.body.modelName;
+  const clsName = req.body.clsName;
+  const reqNo = req.body.reqNo;
   const description = [];
   for (const file of files) {
     const img = await canvas.loadImage(file.data);
@@ -101,9 +103,10 @@ app.post("/loadimage", async (req, res, next) => {
   console.log(result);
 
   const storeData = {
-    clsName: "cseA",
+    clsName: clsName,
     label: result._label,
     descriptors: result._descriptors,
+    reqNo: reqNo,
   };
 
   console.log(storeData);
