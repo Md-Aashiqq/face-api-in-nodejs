@@ -100,12 +100,15 @@ app.post("/loadimage", async (req, res, next) => {
 
   console.log(result);
 
-  const stotreData = {
+  const storeData = {
     clsName: "cseA",
-    data: result,
+    label: result._label,
+    descriptors: result._descriptors[0],
   };
 
-  const data = await DataModel.create(stotreData);
+  console.log(storeData);
+
+  const data = await DataModel.create(storeData);
   res.status(200).json({ data: data });
 });
 
@@ -122,40 +125,57 @@ app.post("/compareImage", async (req, res) => {
   try {
     const DBdata = await DataModel.find(
       { clsName: "cseA" },
-      { data: 1, _id: 0 }
+      { descriptors: 1, label: 1, _id: 0 }
     );
+    faceFaceDescriptors = [];
+    DBdata.forEach((element) => {
+      console.log("start");
+      console.log(element.label);
+      var disArray = Object.values(element.descriptors[0][0]);
 
-    // faceFaceDescriptors = [];
+      const result = new faceapi.LabeledFaceDescriptors(element.label, [
+        new Float32Array(disArray),
+      ]);
+      faceFaceDescriptors.push(result);
+    });
+    console.log(faceFaceDescriptors);
 
-    // DBdata.forEach((element) => {
-    //   console.log("start");
-    //   console.log(element.data._label);
-    //   const result = new faceapi.LabeledFaceDescriptors(
-    //     element.data._label,
-    //     element.data._descriptors
-    //   );
-    //   faceFaceDescriptors.push(result);
-    // });
-    // console.log(faceFaceDescriptors);
-
-    // console.log("faceMatcher");
-    // const faceMatcher = faceapi.FaceMatcher(faceFaceDescriptors, 0.6);
-    // console.log(faceMatcher);
+    console.log("faceMatcher");
+    const faceMatcher = new faceapi.FaceMatcher(faceFaceDescriptors, 0.6);
+    console.log(faceMatcher);
 
     console.log("loadImge");
-    const img = await canvas.loadImage(uploadImage.data);
+    const img = await canvas.loadImage(files.data);
     const myCanvas = canvas.createCanvas(200, 200);
     const ctx = myCanvas.getContext("2d");
     ctx.drawImage(img, 0, 0, 200, 200);
+
+    const displaySize = { width: 200, height: 200 };
+
     console.log("detection");
-    const detection = await faceapi
-      .detectAllFaces(myCanvas, faceDetectionOptions)
+    const detections = await faceapi
+      .detectAllFaces(myCanvas)
       .withFaceLandmarks()
-      .withFaceDescriptor();
-    console.log(detection);
+      .withFaceDescriptors();
+    console.log(detections);
+
+    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+    console.log("check face");
+
+    const results = resizedDetections.map((d) =>
+      faceMatcher.findBestMatch(d.descriptor)
+    );
+    console.log(results);
+    results.forEach((result, i) => {
+      const box = resizedDetections[i].detection.box;
+      console.log(result.toString());
+    });
 
     res.status(200).json({ data: DBdata });
-  } catch (e) {}
+  } catch (e) {
+    console.log(e);
+  }
 });
 
 const port = process.env.PORT || 3000;

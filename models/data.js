@@ -5,8 +5,12 @@ const dataSchema = mongoose.Schema({
     type: String,
     required: ["Please Provied The class Name", true],
   },
-  data: {
-    type: Object,
+  label: {
+    type: String,
+  },
+  descriptors: {
+    type: [Array],
+    default: [],
   },
 });
 
