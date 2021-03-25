@@ -3,9 +3,8 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const fetch = require("node-fetch");
-const b = require("based-blob");
 const faceapi = require("face-api.js");
-// const tf = require("@tensorflow/tfjs-node");
+const tf = require("@tensorflow/tfjs-node");
 const canvas = require("canvas");
 const fileUpload = require("express-fileupload");
 const { registerFont, createCanvas } = require("canvas");
@@ -19,12 +18,11 @@ mongoose.connect(
     useCreateIndex: true,
     useFindAndModify: true,
   }
-)
-// const dataModel = require("./models/data");
+);
 const DataModel = require("./models/data");
 
-
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
@@ -32,9 +30,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "*");
   next();
 });
-
 app.use(fileUpload());
-
 app.use(express.static("public"));
 
 // mokey pathing the faceapi canvas
@@ -73,7 +69,6 @@ function getFaceDetectorOptions(net) {
     ? new faceapi.TinyFaceDetectorOptions({ inputSize, scoreThreshold })
     : new faceapi.MtcnnOptions({ minFaceSize, scaleFactor });
 }
-
 const faceDetectionOptions = getFaceDetectorOptions(faceDetectionNet);
 
 app.get("/load", async (req, res) => {
@@ -81,15 +76,9 @@ app.get("/load", async (req, res) => {
 });
 
 app.post("/loadimage", async (req, res, next) => {
-  console.log(req.body);
-  console.log(req.files);
-
+  console.log("start");
   const files = req.files.uploadImage;
-
   const studentName = req.body.modelName;
-
-  // const result = Promise.all(
-
   const description = [];
   for (const file of files) {
     const img = await canvas.loadImage(file.data);
@@ -107,23 +96,21 @@ app.post("/loadimage", async (req, res, next) => {
     description.push(detection.descriptor);
   }
 
-  const result = new faceapi.LabeledFaceDescriptors(
-    studentName,
-    description
-  );
+  const result = new faceapi.LabeledFaceDescriptors(studentName, description);
 
   console.log(result);
 
-
   const stotreData = {
-    clsName : 'cseA',
-    data: result
-  }
+    clsName: "cseA",
+    data: result,
+  };
 
-  const data = await DataModel.create(stotreData)
+  const data = await DataModel.create(stotreData);
+  res.status(200).json({ data: data });
+});
 
-  console.log(data)
-
+app.get("/getData", async (req, res) => {
+  const data = await DataModel.find({ clsName: "cseA" });
   res.status(200).json({ data: data });
 });
 
