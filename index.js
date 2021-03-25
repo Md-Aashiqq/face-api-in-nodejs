@@ -4,7 +4,7 @@ const path = require("path");
 const cors = require("cors");
 const fetch = require("node-fetch");
 const faceapi = require("face-api.js");
-const tf = require("@tensorflow/tfjs-node");
+// const tf = require("@tensorflow/tfjs-node");
 const canvas = require("canvas");
 const fileUpload = require("express-fileupload");
 const { registerFont, createCanvas } = require("canvas");
@@ -103,7 +103,7 @@ app.post("/loadimage", async (req, res, next) => {
   const storeData = {
     clsName: "cseA",
     label: result._label,
-    descriptors: result._descriptors[0],
+    descriptors: result._descriptors,
   };
 
   console.log(storeData);
@@ -124,25 +124,22 @@ app.post("/compareImage", async (req, res) => {
   const clsName = req.body.clsName;
   try {
     const DBdata = await DataModel.find(
-      { clsName: "cseA" },
+      { clsName: clsName },
       { descriptors: 1, label: 1, _id: 0 }
     );
     faceFaceDescriptors = [];
     DBdata.forEach((element) => {
       console.log("start");
-      console.log(element.label);
-      var disArray = Object.values(element.descriptors[0][0]);
-
-      const result = new faceapi.LabeledFaceDescriptors(element.label, [
-        new Float32Array(disArray),
-      ]);
+      diss = [];
+      element.descriptors.forEach((ele) => {
+        diss.push(new Float32Array(Object.values(ele[0])));
+      });
+      const result = new faceapi.LabeledFaceDescriptors(element.label, diss);
       faceFaceDescriptors.push(result);
     });
-    console.log(faceFaceDescriptors);
 
     console.log("faceMatcher");
     const faceMatcher = new faceapi.FaceMatcher(faceFaceDescriptors, 0.6);
-    console.log(faceMatcher);
 
     console.log("loadImge");
     const img = await canvas.loadImage(files.data);
@@ -157,7 +154,6 @@ app.post("/compareImage", async (req, res) => {
       .detectAllFaces(myCanvas)
       .withFaceLandmarks()
       .withFaceDescriptors();
-    console.log(detections);
 
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
@@ -166,13 +162,16 @@ app.post("/compareImage", async (req, res) => {
     const results = resizedDetections.map((d) =>
       faceMatcher.findBestMatch(d.descriptor)
     );
-    console.log(results);
+
+    const sendData = [];
+
     results.forEach((result, i) => {
       const box = resizedDetections[i].detection.box;
       console.log(result.toString());
+      sendData.push({ name: result.toString(), box: box });
     });
 
-    res.status(200).json({ data: DBdata });
+    res.status(200).json({ data: sendData });
   } catch (e) {
     console.log(e);
   }
